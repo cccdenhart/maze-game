@@ -1,9 +1,13 @@
+package cdenhart.maze;
+
+
 // represents a connection between vertices
-class Edge {
-    Vertex from;
-    Vertex to;
-    int weight;
-    String direction;
+public class Edge {
+
+  private Vertex from;
+    private Vertex to;
+    private int weight;
+    private String direction;
   
     Edge(int weight, String direction) {
       this.weight = weight;
@@ -36,5 +40,21 @@ class Edge {
       this.from = given;
       given.outEdges.add(this);
     }
+
+  public Vertex getFrom() {
+    return from;
+  }
+
+  public Vertex getTo() {
+    return to;
+  }
+
+  public int getWeight() {
+    return weight;
+  }
+
+  public String getDirection() {
+    return direction;
+  }
   
   }

@@ -1,4 +1,9 @@
-class ExamplesMaze {
+package cdenhart.maze;
+
+import java.util.ArrayList;
+import tester.*;
+
+public class ExamplesMaze {
 
   Vertex A;
   Vertex B;
@@ -190,7 +195,7 @@ class ExamplesMaze {
 
     for (int i = 0; i < edgeList.size(); i++) {
       if (i + 1 < edgeList.size()) {
-        t.checkExpect(edgeList.get(i).weight <= edgeList.get(i + 1).weight, true);
+        t.checkExpect(edgeList.get(i).getWeight() <= edgeList.get(i + 1).getWeight(), true);
       }
     }
   }
@@ -270,10 +275,11 @@ class ExamplesMaze {
   }
 
   // testing bigBang()
-  void testBigBang(Tester t) {
-    this.initConditions();
+  public static void main(String[] args) {
+    ExamplesMaze maze = new ExamplesMaze();
+    maze.initConditions();
 
-    this.world.bigBang(this.world.worldWidth * MazeWorld.CELL_SIZE + 10,
-            this.world.worldHeight * MazeWorld.CELL_SIZE + 10, .000001);
+    maze.world.bigBang(maze.world.worldWidth * MazeWorld.CELL_SIZE + 10,
+            maze.world.worldHeight * MazeWorld.CELL_SIZE + 10, .000001);
   }
 }

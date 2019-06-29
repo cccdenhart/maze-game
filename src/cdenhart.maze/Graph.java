@@ -1,11 +1,17 @@
+package cdenhart.maze;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+
 // represents a series of vertices
-class Graph {
+public class Graph {
     ArrayList<Vertex> allVertex;
     HashMap<Vertex, Vertex> representatives;
   
-    Graph() {
-      this.allVertex = new ArrayList<Vertex>();
-      this.representatives = new HashMap<Vertex, Vertex>();
+    public Graph() {
+      this.allVertex = new ArrayList<>();
+      this.representatives = new HashMap<>();
   
     }
   
@@ -19,7 +25,7 @@ class Graph {
     // returns a sorted list of all edges in this graph
     ArrayList<Edge> makeEdges() {
   
-      ArrayList<Edge> edgeList = new ArrayList<Edge>();
+      ArrayList<Edge> edgeList = new ArrayList<>();
   
       for (Vertex v : this.allVertex) {
         for (Edge e : v.outEdges) {
@@ -34,7 +40,7 @@ class Graph {
   
     // initialize nodes to themselves
     ArrayList<Edge> kruskal() {
-      ArrayList<Edge> edgesInTree = new ArrayList<Edge>();
+      ArrayList<Edge> edgesInTree = new ArrayList<>();
       ArrayList<Edge> worklist;
   
       this.initRepresentatives();
@@ -44,8 +50,8 @@ class Graph {
       // adds edges until there are v - 1 edges
       while ((edgesInTree.size() < (this.allVertex.size() - 1)) && worklist.size() > 0) {
         Edge nextEdge = worklist.remove(0);
-        Vertex from = nextEdge.from;
-        Vertex to = nextEdge.to;
+        Vertex from = nextEdge.getFrom();
+        Vertex to = nextEdge.getTo();
   
         if (!(find(from).equals(find(to)))) {
           edgesInTree.add(nextEdge);

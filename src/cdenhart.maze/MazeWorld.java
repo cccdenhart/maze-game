@@ -1,36 +1,36 @@
+package cdenhart.maze;
+
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Queue;
+import java.util.Random;
+import javalib.impworld.*;
+import javalib.worldimages.*;
+
 // represents the world state of a maze
-class MazeWorld extends World {
+public class MazeWorld extends World {
     Graph state;
-    ArrayList<ArrayList<Vertex>> initVertex;
+    private ArrayList<ArrayList<Vertex>> initVertex;
     int worldHeight;
     int worldWidth;
     static final int CELL_SIZE = 30;
-    Player player;
-    boolean isPlaying;
-    boolean theGameIsOver;
-    String outcome;
-    boolean isAnimating;
-    String type;
-    boolean isSearching;
-    java.util.AbstractList<Vertex> worklist;
-    HashMap<Vertex, Vertex> cameFromEdge;
-    ArrayList<Vertex> alreadyChecked;
-    boolean startAnimating;
+    private Player player;
+    private boolean isPlaying;
+    private boolean theGameIsOver;
+    private String outcome;
+    private boolean isAnimating;
+    private String type;
+    private boolean isSearching;
+    private java.util.AbstractList<Vertex> worklist;
+    private HashMap<Vertex, Vertex> cameFromEdge;
+    private ArrayList<Vertex> alreadyChecked;
+    private boolean startAnimating;
   
-    MazeWorld() {
+    public MazeWorld() {
       this.worldHeight = 20;
       this.worldWidth = 20;
-      this.initVertex = new ArrayList<ArrayList<Vertex>>();
-      this.state = new Graph();
-      this.isPlaying = false;
-      this.updateWalls();
-      this.theGameIsOver = false;
-      this.isAnimating = false;
-      this.isSearching = true;
-      this.type = "b";
-      // store information about the path
-      this.cameFromEdge = new HashMap<Vertex, Vertex>();
-      this.alreadyChecked = new ArrayList<Vertex>();
+      this.reset();
       this.startAnimating = false;
       this.player = new Player(this.state.allVertex, this.cameFromEdge);
     }
@@ -61,41 +61,41 @@ class MazeWorld extends World {
   
     // changes the world based on key input
     public void onKeyEvent(String ke) {
-      if (ke.equals("p")) {
-        if (this.isPlaying) {
-          this.isPlaying = false;
-        }
-        else {
-          this.isPlaying = true;
-        }
-      }
-      else if (ke.equals("left") || ke.equals("right") || ke.equals("up") || ke.equals("down")) {
-        if (this.isPlaying) {
-          this.player.movePlayer(ke);
-        }
-      }
-      else if (ke.equals("r")) {
-        this.reset();
-      }
-      else if (ke.equals("a")) {
-        if (this.isAnimating)
-          this.isAnimating = false;
-        else {
-          this.initSearchConditions();
-          this.isAnimating = true;
-        }
-      }
-      else if (ke.equals("b")) {
-        this.partialReset();
-        this.startAnimating = true;
-        this.type = "b";
-        this.breadthSearch();
-      }
-      else if (ke.equals("d")) {
-        this.partialReset();
-        this.startAnimating = true;
-        this.type = "d";
-        this.depthSearch();
+      switch (ke) {
+        case "p":
+          this.isPlaying = !this.isPlaying;
+          break;
+        case "left":
+        case "right":
+        case "up":
+        case "down":
+          if (this.isPlaying) {
+            this.player.movePlayer(ke);
+          }
+          break;
+        case "r":
+          this.reset();
+          break;
+        case "a":
+          if (this.isAnimating)
+            this.isAnimating = false;
+          else {
+            this.initSearchConditions();
+            this.isAnimating = true;
+          }
+          break;
+        case "b":
+          this.partialReset();
+          this.startAnimating = true;
+          this.type = "b";
+          this.breadthSearch();
+          break;
+        case "d":
+          this.partialReset();
+          this.startAnimating = true;
+          this.type = "d";
+          this.depthSearch();
+          break;
       }
     }
   
@@ -110,7 +110,7 @@ class MazeWorld extends World {
     }
   
     // shows the final world scene
-    WorldScene makeAFinalScene() {
+    private WorldScene makeAFinalScene() {
       int width = this.worldWidth * CELL_SIZE;
       int height = this.worldHeight * CELL_SIZE;
       WorldScene scene = new WorldScene(width, height);
@@ -118,15 +118,11 @@ class MazeWorld extends World {
       scene.placeImageXY(new TextImage(this.outcome, 40, Color.BLACK), width / 2, height / 2);
   
       return scene;
-      // this.reconstruct(this.cameFromEdge,
-      // this.state.allVertex.get(this.state.allVertex.size() - 1));
-      // return this.makeScene();
-  
     }
   
     // resets all world initialized conditions
-    void reset() {
-      this.initVertex = new ArrayList<ArrayList<Vertex>>();
+    private void reset() {
+      this.initVertex = new ArrayList<>();
       this.state = new Graph();
       this.isPlaying = false;
       this.updateWalls();
@@ -135,19 +131,19 @@ class MazeWorld extends World {
       this.isSearching = true;
       this.type = "b";
       this.startAnimating = false;
-      this.cameFromEdge = new HashMap<Vertex, Vertex>();
-      this.alreadyChecked = new ArrayList<Vertex>();
+      this.cameFromEdge = new HashMap<>();
+      this.alreadyChecked = new ArrayList<>();
       this.player = new Player(this.state.allVertex, this.cameFromEdge);
     }
   
     // resets everything, but keeps the same wall structure
-    void partialReset() {
+    private void partialReset() {
       this.isPlaying = false;
       this.isSearching = true;
       this.type = "b";
       // store information about the path
-      this.cameFromEdge = new HashMap<Vertex, Vertex>();
-      this.alreadyChecked = new ArrayList<Vertex>();
+      this.cameFromEdge = new HashMap<>();
+      this.alreadyChecked = new ArrayList<>();
       for (Vertex v : this.state.allVertex) {
         v.hasPlayer = false;
         v.isVisited = false;
@@ -156,17 +152,17 @@ class MazeWorld extends World {
     }
   
     // checks if the player is at the end
-    void checkPlayer() {
-      if (this.player.x == (this.worldWidth - 1) && this.player.y == (this.worldHeight - 1)) {
+    private void checkPlayer() {
+      if (this.player.getX() == (this.worldWidth - 1) && this.player.getY() == (this.worldHeight - 1)) {
         this.theGameIsOver = true;
         this.outcome = "You Win!";
       }
     }
   
     // uses nested for loops to add vertices to the graph and assign positions
-    void initVertices() {
+    private void initVertices() {
       for (int i = 0; i < this.worldHeight; i++) {
-        ArrayList<Vertex> colList = new ArrayList<Vertex>();
+        ArrayList<Vertex> colList = new ArrayList<>();
         for (int j = 0; j < this.worldWidth; j++) {
           Vertex nextVertex = new Vertex(j, i);
           colList.add(nextVertex);
@@ -176,7 +172,7 @@ class MazeWorld extends World {
     }
   
     // connects all of the verteces with edges
-    void initEdges() {
+    private void initEdges() {
       this.initVertices();
       for (int i = 0; i < this.worldHeight; i++) {
         for (int j = 0; j < this.worldWidth; j++) {
@@ -189,42 +185,40 @@ class MazeWorld extends World {
       }
     }
   
-    // connects the edge between two verteces in the given direction
-    void addEdge(Vertex v, int x, int y, String dir) {
+    // connects the edge between two vertexes in the given direction
+    private void addEdge(Vertex v, int x, int y, String dir) {
       int randomWeight = new Random().nextInt() * 10;
       Edge nextEdge = new Edge(randomWeight, dir);
       nextEdge.updateFrom(v);
-      if (dir.equals("t")) {
-        if (this.isOutOfBounds(y - 1, this.worldHeight)) {
-          nextEdge.updateTo(v);
-        }
-        else {
-          nextEdge.updateTo(this.initVertex.get(y - 1).get(x));
-        }
-      }
-      else if (dir.equals("r")) {
-        if (this.isOutOfBounds(x + 1, this.worldWidth)) {
-          nextEdge.updateTo(v);
-        }
-        else {
-          nextEdge.updateTo(this.initVertex.get(y).get(x + 1));
-        }
-      }
-      else if (dir.equals("b")) {
-        if (this.isOutOfBounds(y + 1, this.worldHeight)) {
-          nextEdge.updateTo(v);
-        }
-        else {
-          nextEdge.updateTo(this.initVertex.get(y + 1).get(x));
-        }
-      }
-      else {
-        if (this.isOutOfBounds(x - 1, this.worldWidth)) {
-          nextEdge.updateTo(v);
-        }
-        else {
-          nextEdge.updateTo(this.initVertex.get(y).get(x - 1));
-        }
+      switch (dir) {
+        case "t":
+          if (this.isOutOfBounds(y - 1, this.worldHeight)) {
+            nextEdge.updateTo(v);
+          } else {
+            nextEdge.updateTo(this.initVertex.get(y - 1).get(x));
+          }
+          break;
+        case "r":
+          if (this.isOutOfBounds(x + 1, this.worldWidth)) {
+            nextEdge.updateTo(v);
+          } else {
+            nextEdge.updateTo(this.initVertex.get(y).get(x + 1));
+          }
+          break;
+        case "b":
+          if (this.isOutOfBounds(y + 1, this.worldHeight)) {
+            nextEdge.updateTo(v);
+          } else {
+            nextEdge.updateTo(this.initVertex.get(y + 1).get(x));
+          }
+          break;
+        default:
+          if (this.isOutOfBounds(x - 1, this.worldWidth)) {
+            nextEdge.updateTo(v);
+          } else {
+            nextEdge.updateTo(this.initVertex.get(y).get(x - 1));
+          }
+          break;
       }
     }
   
@@ -233,8 +227,8 @@ class MazeWorld extends World {
       return i >= boundary || i < 0;
     }
   
-    // adds all of the initialized verteces to this graph's list of vertex
-    void addVertices() {
+    // adds all of the initialized vertexes to this graph's list of vertex
+    private void addVertices() {
       this.initEdges();
       for (int i = 0; i < this.worldHeight; i++) {
         for (int j = 0; j < this.worldWidth; j++) {
@@ -246,37 +240,37 @@ class MazeWorld extends World {
     }
   
     // removes walls between all cells connected by edges produced by kruskal's
-    void updateWalls() {
+    private void updateWalls() {
       this.addVertices();
-      ArrayList<Edge> toRemove = /* new ArrayList<Edge>(); */ this.state.kruskal();
-      ArrayList<Edge> alreadyChecked = new ArrayList<Edge>();
+      ArrayList<Edge> toRemove = this.state.kruskal();
+      ArrayList<Edge> alreadyChecked = new ArrayList<>();
   
       for (Vertex v : this.state.allVertex) {
         for (Edge e : v.outEdges) {
           if (!(alreadyChecked.contains(e))) {
             if (toRemove.contains(e)) {
-              Vertex adjacentCell = e.to;
+              Vertex adjacentCell = e.getTo();
   
               // check direction of connection
-              if (e.direction.equals("t") && !(this.isOutOfBounds(v.y - 1, this.worldHeight))) {
+              if (e.getDirection().equals("t") && !(this.isOutOfBounds(v.y - 1, this.worldHeight))) {
                 if (!(v.equals(adjacentCell))) {
                   v.topEdge = true;
                   adjacentCell.bottomEdge = true;
                 }
               }
-              if (e.direction.equals("r") && !(this.isOutOfBounds(v.x + 1, this.worldWidth))) {
+              if (e.getDirection().equals("r") && !(this.isOutOfBounds(v.x + 1, this.worldWidth))) {
                 if (!(v.equals(adjacentCell))) {
                   v.rightEdge = true;
                   adjacentCell.leftEdge = true;
                 }
               }
-              if (e.direction.equals("b") && !(this.isOutOfBounds(v.y + 1, this.worldHeight))) {
+              if (e.getDirection().equals("b") && !(this.isOutOfBounds(v.y + 1, this.worldHeight))) {
                 if (!(v.equals(adjacentCell))) {
                   v.bottomEdge = true;
                   adjacentCell.topEdge = true;
                 }
               }
-              if (e.direction.equals("l") && !(this.isOutOfBounds(v.x - 1, this.worldWidth))) {
+              if (e.getDirection().equals("l") && !(this.isOutOfBounds(v.x - 1, this.worldWidth))) {
                 if (!(v.equals(adjacentCell))) {
                   v.leftEdge = true;
                   adjacentCell.rightEdge = true;
@@ -290,7 +284,7 @@ class MazeWorld extends World {
     }
   
     // solves the maze using breadth search
-    void breadthSearch() {
+    private void breadthSearch() {
       this.initSearchConditions();
       if (!(this.isAnimating)) {
         this.implementSearch("b");
@@ -298,7 +292,7 @@ class MazeWorld extends World {
     }
   
     // solves the maze using depth search
-    void depthSearch() {
+    private void depthSearch() {
       this.initSearchConditions();
       if (!(this.isAnimating)) {
         this.implementSearch("d");
@@ -306,7 +300,7 @@ class MazeWorld extends World {
     }
   
     // implements the search regardless of type
-    void implementSearch(String type) {
+    private void implementSearch(String type) {
   
       while (this.worklist.size() > 0 && this.isSearching) {
         this.nextStep();
@@ -315,7 +309,7 @@ class MazeWorld extends World {
   
     // implements the next step of the search
     @SuppressWarnings("unchecked")
-    void nextStep() {
+    private void nextStep() {
   
       // get the next vertex
       Vertex next;
@@ -340,13 +334,13 @@ class MazeWorld extends World {
       }
       else {
         for (Edge e : next.outEdges) {
-          if (((e.direction.equals("t") && next.topEdge)
-                  || (e.direction.equals("r") && next.rightEdge)
-                  || (e.direction.equals("l") && next.leftEdge)
-                  || (e.direction.equals("b") && next.bottomEdge))
-                  && this.cameFromEdge.get(e.to) == null) {
-            this.worklist.add(e.to);
-            this.cameFromEdge.put(e.to, next);
+          if (((e.getDirection().equals("t") && next.topEdge)
+                  || (e.getDirection().equals("r") && next.rightEdge)
+                  || (e.getDirection().equals("l") && next.leftEdge)
+                  || (e.getDirection().equals("b") && next.bottomEdge))
+                  && this.cameFromEdge.get(e.getTo()) == null) {
+            this.worklist.add(e.getTo());
+            this.cameFromEdge.put(e.getTo(), next);
           }
         }
       }
@@ -355,7 +349,7 @@ class MazeWorld extends World {
     }
   
     // travels back along the path, labeling each vertex as being part of it
-    void reconstruct(HashMap<Vertex, Vertex> hashMap, Vertex v) {
+    private void reconstruct(HashMap<Vertex, Vertex> hashMap, Vertex v) {
       v.isPath = true;
       if (!(v.x == 0 && v.y == 0)) {
         Vertex next = hashMap.get(v);
@@ -364,12 +358,12 @@ class MazeWorld extends World {
     }
   
     // initializes search conditions
-    void initSearchConditions() {
+    private void initSearchConditions() {
       if (this.type.equals("b")) {
-        this.worklist = new java.util.LinkedList<Vertex>();
+        this.worklist = new java.util.LinkedList<>();
       }
       else if (this.type.equals("d")) {
-        this.worklist = new java.util.Stack<Vertex>();
+        this.worklist = new java.util.Stack<>();
       }
       else {
         throw new RuntimeException("This search type does not exist");

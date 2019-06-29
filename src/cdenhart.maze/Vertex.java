@@ -1,38 +1,48 @@
+package cdenhart.maze;
+import java.awt.Color;
+import java.util.ArrayList;
+import javalib.impworld.WorldScene;
+import javalib.worldimages.LineImage;
+import javalib.worldimages.OutlineMode;
+import javalib.worldimages.Posn;
+import javalib.worldimages.RectangleImage;
+import javalib.worldimages.WorldImage;
+
 // represents a single vertex
-class Vertex {
+public class Vertex {
     int x;
     int y;
     ArrayList<Edge> outEdges; // edges from this node
-  
+
     boolean leftEdge;
     boolean topEdge;
     boolean rightEdge;
     boolean bottomEdge;
-  
+
     boolean isVisited;
     boolean isPath;
     boolean hasPlayer;
-  
-    Vertex(int x, int y) {
+
+    public Vertex(int x, int y) {
       this.outEdges = new ArrayList<Edge>();
       this.x = x;
       this.y = y;
-  
+
       this.leftEdge = false;
       this.topEdge = false;
       this.rightEdge = false;
       this.bottomEdge = false;
-  
+
       this.isVisited = false;
       this.isPath = false;
       this.hasPlayer = false;
     }
-  
+
     // create hash code
     public int hashCode() {
       return this.x * 10000 + this.y;
     }
-  
+
     // Override equals
     public boolean equals(Object other) {
       if (!(other instanceof Vertex)) {
@@ -41,13 +51,13 @@ class Vertex {
       Vertex that = (Vertex) other;
       return this.x == that.x && this.y == that.y;
     }
-  
+
     void cellImage(WorldScene acc, boolean isPlaying, Posn lastCell) {
       // initial variables
       int size = MazeWorld.CELL_SIZE;
       int imageX = this.x * size + size / 2 + 5;
       int imageY = this.y * size + size / 2 + 5;
-  
+
       // create cell image
       WorldImage cell = new RectangleImage(size, size, OutlineMode.SOLID, Color.LIGHT_GRAY);
       if (this.isVisited) {
@@ -63,7 +73,7 @@ class Vertex {
         cell = new RectangleImage(size, size, OutlineMode.SOLID, Color.red);
       }
       acc.placeImageXY(cell, imageX, imageY);
-  
+
       // add edges
       WorldImage horEdge = new LineImage(new Posn(size - 1, 0), Color.BLACK);
       WorldImage verEdge = new LineImage(new Posn(0, size), Color.BLACK);
